@@ -88,7 +88,7 @@ def main():
             csv_path="data/products_catalog.csv",
             persist_directory="./chroma_db",
             collection_name="products",
-            use_openai=True,
+            use_azure=True,
             batch_size=50
         )
         

@@ -255,34 +255,41 @@ class VectorStore:
         Returns:
             Dictionary containing filtered query results
         """
-        where_filter = {}
+        # Build individual filter conditions
+        where_conditions = []
         
         if category:
-            where_filter["category"] = category
+            where_conditions.append({"category": category})
         
         if stock_status:
-            where_filter["stock_status"] = stock_status
+            where_conditions.append({"stock_status": stock_status})
         
         if brand:
-            where_filter["brand"] = brand
+            where_conditions.append({"brand": brand})
         
         # ChromaDB supports $gte, $lte operators for numeric comparisons
-        if min_price is not None:
-            where_filter["price"] = {"$gte": min_price}
-        
-        if max_price is not None:
-            if "price" in where_filter:
-                where_filter["price"]["$lte"] = max_price
-            else:
-                where_filter["price"] = {"$lte": max_price}
+        if min_price is not None and max_price is not None:
+            where_conditions.append({"price": {"$gte": min_price, "$lte": max_price}})
+        elif min_price is not None:
+            where_conditions.append({"price": {"$gte": min_price}})
+        elif max_price is not None:
+            where_conditions.append({"price": {"$lte": max_price}})
         
         if min_rating is not None:
-            where_filter["rating"] = {"$gte": min_rating}
+            where_conditions.append({"rating": {"$gte": min_rating}})
+        
+        # Combine multiple conditions with $and operator
+        where_filter = None
+        if where_conditions:
+            if len(where_conditions) == 1:
+                where_filter = where_conditions[0]
+            else:
+                where_filter = {"$and": where_conditions}
         
         return self.query(
             query_texts=[query_text],
             n_results=n_results,
-            where=where_filter if where_filter else None
+            where=where_filter
         )
     
     def is_initialized(self) -> bool:

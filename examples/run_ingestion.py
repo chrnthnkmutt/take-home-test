@@ -37,7 +37,7 @@ def run_full_ingestion():
             csv_path="data/products_catalog.csv",
             persist_directory="./chroma_db",
             collection_name="products",
-            use_openai=True,  # Set to False to use sentence-transformers
+            use_azure=True,  # Set to False to use sentence-transformers
             batch_size=100
         )
         
