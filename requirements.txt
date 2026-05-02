@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+langchain
+# Azure OpenAI integration via LangChain (provides AzureChatOpenAI and AzureOpenAIEmbeddings)
+langchain-openai
+python-dotenv
+sqlalchemy
+requests
+beautifulsoup4
+pytest
+chromadb
+sentence-transformers
+pandas
+locust

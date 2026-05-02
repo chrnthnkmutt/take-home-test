@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  api:
+    build: .
+    image: ai-product-research:latest
+    container_name: apr_api
+    command: ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app:delegated
+      - ./chroma_db:/app/chroma_db
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+  ingestion:
+    build: .
+    image: ai-product-research:latest
+    container_name: apr_ingestion
+    command: ["python", "examples/run_ingestion.py"]
+    volumes:
+      - ./:/app:delegated
+      - ./data:/app/data
+      - ./chroma_db:/app/chroma_db
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: "no"
+
+# Note: This compose file mounts the project for convenience during development.
+# For production, consider removing the bind mounts and using a clean image.
