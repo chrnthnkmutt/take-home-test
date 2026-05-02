@@ -62,16 +62,18 @@ def main():
     # Load environment variables
     load_dotenv()
     
-    # Check for required API keys
-    google_key = os.getenv("GOOGLE_API_KEY")
-    openai_key = os.getenv("OPENAI_API_KEY")
-    
+    # Check for required Azure OpenAI environment variables
+    azure_key = os.getenv("AZURE_OPENAI_API_KEY")
+    azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+    azure_deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+
     print("Environment Check:")
-    print_result("Google API Key", "✓ Set" if google_key else "✗ Not set")
-    print_result("OpenAI API Key", "✓ Set" if openai_key else "✗ Not set (will use fallback)")
-    
-    if not google_key:
-        logger.warning("Google API Key not set. Agent will use rule-based routing.")
+    print_result("Azure OpenAI Key", "✓ Set" if azure_key else "✗ Not set")
+    print_result("Azure OpenAI Endpoint", "✓ Set" if azure_endpoint else "✗ Not set")
+    print_result("Azure Deployment Name", "✓ Set" if azure_deployment else "✗ Not set")
+
+    if not azure_key or not azure_deployment:
+        logger.warning("Azure OpenAI credentials incomplete. Agent will use rule-based routing or fallbacks.")
     
     # -------------------------------------------------------------------------
     # STEP 1: Run Data Ingestion Pipeline

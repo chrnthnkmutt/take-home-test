@@ -34,7 +34,7 @@ The AI Product Research Assistant is a sophisticated multi-agent system that int
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │              ProductResearchAgent                         │  │
 │  │  ┌────────────────────────────────────────────────────┐  │  │
-│  │  │  LLM-Based Router (Gemini 1.5 Flash)              │  │  │
+│  │  │  LLM-Based Router (Azure OpenAI)                  │  │  │
 │  │  │  - Analyzes query intent                           │  │  │
 │  │  │  - Selects appropriate tools                       │  │  │
 │  │  │  - Determines execution order                      │  │  │
@@ -124,7 +124,7 @@ The agent is the brain of the system, responsible for intelligent query routing 
 **Routing Strategies:**
 
 1. **LLM-Based Routing** (Preferred)
-   - Uses Google Gemini 1.5 Flash
+   - Uses Azure OpenAI
    - Analyzes query semantics
    - Provides reasoning for tool selection
    - Handles complex, multi-intent queries
@@ -168,8 +168,8 @@ Query Type → Tools Used
 **Purpose**: Semantic search over product catalog using RAG (Retrieval-Augmented Generation)
 
 **Technology Stack:**
-- ChromaDB for vector storage
-- Google Gemini embeddings (text-embedding-004) or sentence-transformers (fallback)
+ - ChromaDB for vector storage
+ - Azure OpenAI embeddings (or sentence-transformers fallback)
 - LangChain for RAG pipeline
 
 **Features:**
@@ -247,7 +247,7 @@ Query Type → Tools Used
 ```
 CSV File → Load → Validate → Transform → Embed → Store
    ↓         ↓        ↓          ↓         ↓       ↓
-products  pandas   check    create    OpenAI  ChromaDB
+products  pandas   check    create    Azure OpenAI  ChromaDB
 catalog   DataFrame schema   text     or ST   vector DB
 ```
 
@@ -354,8 +354,7 @@ CREATE TABLE feedback (
 | FastAPI | Latest | Web framework |
 | Uvicorn | Latest | ASGI server |
 | LangChain | Latest | LLM framework |
-| Google Gemini | 1.5 Flash | LLM for routing/aggregation |
-| OpenAI | Latest | Embeddings API |
+| Azure OpenAI | Latest | LLM + Embeddings (hosted on Azure) |
 | ChromaDB | Latest | Vector database |
 | SQLAlchemy | Latest | Database ORM |
 | Pandas | Latest | Data processing |
@@ -493,8 +492,8 @@ async def process_query_async(query: str):
 ### Cost Optimization
 
 **Current Costs (per 1000 queries):**
-- Gemini API: ~$0.10 (routing + aggregation)
-- OpenAI Embeddings: ~$0.02 (if used)
+- Azure OpenAI API: ~$0.10 (routing + aggregation)
+- Azure OpenAI Embeddings: ~$0.02 (if used)
 - Tavily Search: ~$1.00 (if used)
 
 **Optimization Strategies:**
@@ -515,7 +514,7 @@ async def process_query_async(query: str):
 
 **Production Requirements:**
 
-1. **Authentication**: JWT tokens, API keys
+1. **Authentication**: JWT tokens, API keys (store in Azure Key Vault)
 2. **Authorization**: Role-based access control
 3. **Rate Limiting**: Per-user/IP limits
 4. **Encryption**: HTTPS, encrypted database
@@ -702,11 +701,11 @@ spec:
         ports:
         - containerPort: 8000
         env:
-        - name: GOOGLE_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: api-secrets
-              key: google-api-key
+            - name: AZURE_OPENAI_API_KEY
+               valueFrom:
+                  secretKeyRef:
+                     name: api-secrets
+                     key: azure-openai-key
 ```
 
 ## Conclusion

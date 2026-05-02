@@ -453,7 +453,7 @@ Include relevant prices, product names, and key insights. Keep the response conc
         
         # Generate response using LangChain
         response = self.llm.invoke([system_message, human_message])
-        # Handle both string and list responses from Gemini
+        # Handle both string and list responses from Azure OpenAI
         content = response.content if isinstance(response.content, str) else str(response.content[0]) if response.content else ""
         return content.strip()
     

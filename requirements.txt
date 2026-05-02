@@ -2,7 +2,7 @@ fastapi
 uvicorn
 langchain
 # Azure OpenAI integration via LangChain (provides AzureChatOpenAI and AzureOpenAIEmbeddings)
-langchain-openai
+# Use LangChain's Azure integrations (no separate package required)
 python-dotenv
 sqlalchemy
 requests

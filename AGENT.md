@@ -18,7 +18,7 @@ The `ProductResearchAgent` is an intelligent agent that coordinates three specia
 The agent uses two routing strategies:
 
 #### 1. LLM-Based Routing (Preferred)
-- Uses Google Gemini to analyze query intent
+- Uses Azure OpenAI to analyze query intent
 - Understands complex queries and context
 - Provides detailed reasoning for tool selection
 - Handles multi-step queries intelligently
@@ -92,7 +92,11 @@ agent = ProductResearchAgent(
     catalog_tool=catalog_tool,
     web_tool=web_tool,
     price_tool=price_tool,
-    model_name="gemini-2.0-flash-exp",
+    # For Azure OpenAI, provide `azure_api_key`, `azure_endpoint`, and `azure_deployment_name`
+    azure_api_key=None,         # Azure OpenAI key (or use env var AZURE_OPENAI_API_KEY)
+    azure_endpoint=None,        # Azure OpenAI endpoint (or use env var AZURE_OPENAI_ENDPOINT)
+    azure_deployment_name=None, # Deployment name for the model on Azure
+    model_name=None,            # Deprecated for Azure; prefer azure_deployment_name
     temperature=0.3
 )
 
@@ -192,8 +196,10 @@ for tool_name, tool_result in result["results"].items():
 ### Environment Variables
 
 ```bash
-# Required for LLM-based routing and aggregation
-GOOGLE_API_KEY=your_google_api_key
+# Required for LLM-based routing and aggregation (Azure OpenAI)
+AZURE_OPENAI_API_KEY=your_azure_openai_key
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+AZURE_OPENAI_DEPLOYMENT_NAME=your-deployment-name
 
 # Optional - for web search (uses mock if not provided)
 TAVILY_API_KEY=your_tavily_api_key
@@ -206,8 +212,9 @@ ProductResearchAgent(
     catalog_tool=None,           # Optional pre-initialized tool
     web_tool=None,               # Optional pre-initialized tool
     price_tool=None,             # Optional pre-initialized tool
-    google_api_key=None,         # Google API key (or use env var)
-    model_name="gemini-2.0-flash-exp",  # Gemini model for routing
+    azure_api_key=None,          # Azure OpenAI key (or use env var AZURE_OPENAI_API_KEY)
+    azure_endpoint=None,         # Azure OpenAI endpoint (or use env var AZURE_OPENAI_ENDPOINT)
+    azure_deployment_name=None,  # Deployment name for the model on Azure
     temperature=0.3              # Lower = more deterministic routing
 )
 ```
@@ -306,7 +313,7 @@ except Exception as e:
 ## Limitations
 
 1. **Sequential execution only**: Tools run one after another (no parallel execution yet)
-2. **LLM dependency**: Best results require Google API key
+2. **LLM dependency**: Best results require Azure OpenAI credentials (API key + deployment)
 3. **Tool limitations**: Inherits limitations from individual tools
 4. **Context window**: Very long results may be truncated in aggregation
 5. **No conversation history**: Each query is independent
@@ -325,10 +332,11 @@ except Exception as e:
 
 ### Issue: Agent always uses rule-based routing
 
-**Solution**: Ensure `GOOGLE_API_KEY` is set in environment variables
+**Solution**: Ensure Azure OpenAI environment variables are set, for example:
 
 ```bash
-export GOOGLE_API_KEY=your_key
+export AZURE_OPENAI_API_KEY=your_key
+export AZURE_OPENAI_DEPLOYMENT_NAME=your_deployment_name
 # or add to .env file
 ```
 
