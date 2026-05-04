@@ -396,54 +396,87 @@ python examples/quick_start.py
 
 ```
 take-home-test/
-├── .env                          # Environment variables (created on setup)
-├── .env.example                  # Example environment variables
-├── .dockerignore                 # Docker ignore file
-├── .gitignore                    # Git ignore file
-├── data/
-│   └── products_catalog.csv      # Product data
-├── src/
-│   ├── agent/
-│   │   └── agent.py              # AI Agent with routing logic
-│   ├── api/
-│   │   ├── main.py               # FastAPI application
-│   │   └── models.py             # Pydantic models
-│   ├── pipeline/
-│   │   ├── ingestion.py          # Data ingestion pipeline
-│   │   └── vector_store.py       # ChromaDB wrapper
-│   ├── tools/
-│   │   ├── product_catalog_rag.py  # Catalog search tool
-│   │   ├── web_search.py           # Web search tool
-│   │   └── price_analysis.py       # Price analysis tool
-│   ├── database.py               # SQLAlchemy setup
-│   ├── database_operations.py    # Database operations
-│   └── models.py                 # Database models
-├── tests/
-│   ├── test_agent.py             # Agent tests
-│   ├── test_api.py               # API tests
-│   └── test_tools.py             # Tool tests
-├── examples/
-│   ├── run_agent.py              # Agent usage examples
-│   ├── run_ingestion.py          # Ingestion examples
-│   ├── quick_start.py            # Complete workflow
-│   └── test_api.sh               # API testing script
+├── AGENT.md
+├── Dockerfile
+├── docker-compose.yml
+├── README.md
+├── requirements.txt
 ├── architecture/
-│   └── ARCHITECTURE.md           # Architecture documentation
-├── chroma_db/                    # Vector database (created on ingestion)
-├── load_tests/                   # Load testing scripts
-├── test_azure_migration.py       # Azure migration tests
-├── test_ingestion.py             # Ingestion pipeline tests
-├── test_price_analysis.py        # Price analysis tests
-├── test_web_search.py            # Web search tests
-├── docker-compose.yml            # Docker Compose configuration
-├── Dockerfile                    # Docker image definition
-├── AGENT.md                      # Agent documentation
-├── prioritized_fix_list.md       # Priority fix list
-├── queries.db                    # SQLite database for queries (created on first run)
-├── products.db                   # SQLite database for products (created on ingestion)
-├── requirements.txt              # Python dependencies
-└── README.md                     # This file
+│   ├── Architecture.drawio
+│   └── ARCHITECTURE.md
+├── chroma_db/
+│   ├── chroma.sqlite3
+│   └── 879eb3ee-a2a4-41a4-952f-8b5ef255542e/
+├── data/
+│   └── products_catalog.csv
+├── examples/
+│   ├── quick_start.py
+│   ├── run_agent.py
+│   ├── run_ingestion.py
+│   └── test_api.sh
+├── load_tests/
+│   ├── locustfile.py
+│   └── README.md
+├── src/
+│   ├── __init__.py
+│   ├── agent/
+│   │   ├── __init__.py
+│   │   └── agent.py
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   └── models.py
+│   ├── pipeline/
+│   │   ├── __init__.py
+│   │   ├── ingestion.py
+│   │   └── vector_store.py
+│   ├── tools/
+│   │   ├── __init__.py
+│   │   ├── price_analysis.py
+│   │   ├── product_catalog_rag.py
+│   │   └── web_search.py
+│   ├── database.py
+│   ├── database_operations.py
+│   └── models.py
+├── test_chroma_db/
+│   └── chroma.sqlite3
+└── tests/
+  ├── __init__.py
+  ├── test_azure_migration.py
+  ├── test_ingestion.py
+  ├── test_price_analysis.py
+  └── test_web_search.py
 ```
+
+## File descriptions
+
+- [AGENT.md](AGENT.md): Agent design, routing logic, and prompt-engineering notes.
+- [Dockerfile](Dockerfile): Image build steps and runtime setup for the application.
+- [docker-compose.yml](docker-compose.yml): Compose configuration to run the API and ingestion service.
+- [README.md](README.md): Project overview, quick start, API docs, and usage instructions.
+- [requirements.txt](requirements.txt): Python dependencies for running and testing the project.
+- architecture/: Architecture diagrams and system design documentation (see [architecture/ARCHITECTURE.md](architecture/ARCHITECTURE.md)).
+- chroma_db/: Persistent ChromaDB files used by the vector store (local DB snapshot and storage).
+- data/products_catalog.csv: CSV of product records used for ingestion and semantic search.
+- examples/quick_start.py: End-to-end example demonstrating ingestion → query → results.
+- examples/run_agent.py: Minimal example showing how to call the agent programmatically.
+- examples/run_ingestion.py: Script to run the ingestion pipeline locally.
+- examples/test_api.sh: Simple curl-based script to exercise the API endpoints.
+- load_tests/: Locust performance test scripts and README for load testing.
+- src/__init__.py: Package marker for `src`.
+- src/agent/agent.py: Core AI agent implementation that routes queries to tools and aggregates responses.
+- src/api/main.py: FastAPI application and endpoint wiring (POST /query, GET /queries, etc.).
+- src/api/models.py: Pydantic request/response models and validation schemas used by the API.
+- src/pipeline/ingestion.py: Reads the products CSV, generates embeddings, and writes to ChromaDB.
+- src/pipeline/vector_store.py: ChromaDB wrapper and utilities for creating/querying collections.
+- src/tools/product_catalog_rag.py: Product-catalog retrieval tool (semantic search + context formatting).
+- src/tools/web_search.py: Web-search tool (Tavily integration or mock fallback) for market data.
+- src/tools/price_analysis.py: Pricing analysis utilities that compute margins and recommendations.
+- src/database.py: SQLAlchemy engine and session setup (database connection configuration).
+- src/database_operations.py: CRUD and helper functions for storing queries, feedback, and metadata.
+- src/models.py: SQLAlchemy ORM models for queries, feedback, and products.
+- test_chroma_db/chroma.sqlite3: Snapshot of a Chroma DB used in tests.
+- tests/: Unit tests for ingestion, web search, price analysis, and Azure migration.
 
 ## 🔧 Configuration Options
 
@@ -488,7 +521,8 @@ vector_store = get_vector_store(
 7. **Authentication**: No user authentication (should be added for production)
 
 ### Known Issues
-
+- Using Gemini models may hit low rate limits; this repository currently uses OpenAI models hosted via Microsoft Foundry for both LLM and embedding tasks because they perform significantly better for our workloads. Note: using Foundry-hosted OpenAI incurs additional usage costs and requires committee approval/reimbursement.
+- Generated responses may be longer than expected because no explicit token limit is configured for generation; system-prompt tuning and response-length controls are not yet implemented (optimization work pending).
 - Large catalogs (>10,000 products) may require optimization
 - Web search may be slow depending on network and API response times
 - Vector database initialization takes time on first run
